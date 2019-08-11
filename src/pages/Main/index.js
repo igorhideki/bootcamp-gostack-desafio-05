@@ -11,6 +11,7 @@ class Main extends Component {
     newRepo: '',
     repositories: [],
     loading: false,
+    hasInputError: false,
   };
 
   componentDidMount() {
@@ -30,7 +31,10 @@ class Main extends Component {
   }
 
   handleInputChange = e => {
-    this.setState({ newRepo: e.target.value });
+    this.setState({
+      newRepo: e.target.value,
+      hasInputError: false,
+    });
   };
 
   handleOnSubmit = async e => {
@@ -52,12 +56,15 @@ class Main extends Component {
         loading: false,
       });
     } catch (err) {
-      this.setState({ loading: false });
+      this.setState({
+        loading: false,
+        hasInputError: true,
+      });
     }
   };
 
   render() {
-    const { newRepo, loading, repositories } = this.state;
+    const { newRepo, loading, repositories, hasInputError } = this.state;
     return (
       <Container>
         <h1>
@@ -65,7 +72,7 @@ class Main extends Component {
           Repositórios
         </h1>
 
-        <Form onSubmit={this.handleOnSubmit}>
+        <Form onSubmit={this.handleOnSubmit} hasError={hasInputError}>
           <input
             type="text"
             placeholder="Adicionar repositório"
