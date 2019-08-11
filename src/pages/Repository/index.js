@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import api from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, IssueList, Filter } from './style';
+import { Loading, Owner, IssueList, Filter, Pagination } from './style';
 
 class Repository extends Component {
   static propTypes = {
@@ -21,21 +21,17 @@ class Repository extends Component {
     issues: [],
     loading: true,
     issuesFilter: 'open',
+    page: 1,
   };
 
-  componentDidMount() {
-    this.handleFilterIssues();
-  }
-
-  handleFilterIssues = async () => {
-    const { issuesFilter } = this.state;
+  async componentDidMount() {
     const { match } = this.props;
     const repoName = decodeURIComponent(match.params.repository);
     const [repository, issues] = await Promise.all([
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
-          state: issuesFilter,
+          state: 'open',
           per_page: 5,
         },
       }),
@@ -46,19 +42,49 @@ class Repository extends Component {
       issues: issues.data,
       loading: false,
     });
+  }
+
+  handleFetchIssues = async () => {
+    const { match } = this.props;
+    const repoName = decodeURIComponent(match.params.repository);
+    const { issuesFilter, page } = this.state;
+    const { data } = await api.get(`/repos/${repoName}/issues`, {
+      params: {
+        state: issuesFilter,
+        per_page: 5,
+        page,
+      },
+    });
+
+    this.setState({ issues: data });
   };
 
   handleChangeIssuesFilter = e => {
     this.setState({
       issuesFilter: e.target.value,
-      loading: true,
     });
 
-    this.handleFilterIssues();
+    this.handleFetchIssues();
+  };
+
+  handlePrevPage = async () => {
+    const { page } = this.state;
+
+    await this.setState({ page: page - 1 });
+
+    this.handleFetchIssues();
+  };
+
+  handleNextPage = async () => {
+    const { page } = this.state;
+
+    await this.setState({ page: page + 1 });
+
+    this.handleFetchIssues();
   };
 
   render() {
-    const { repository, issues, loading, issuesFilter } = this.state;
+    const { repository, issues, loading, issuesFilter, page } = this.state;
 
     if (loading) {
       return <Loading>Carregando</Loading>;
@@ -100,6 +126,18 @@ class Repository extends Component {
               </div>
             </li>
           ))}
+          <Pagination>
+            <button
+              type="button"
+              disabled={page < 2}
+              onClick={this.handlePrevPage}
+            >
+              Anterior
+            </button>
+            <button type="button" onClick={this.handleNextPage}>
+              Próxima
+            </button>
+          </Pagination>
         </IssueList>
       </Container>
     );

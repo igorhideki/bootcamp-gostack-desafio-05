@@ -115,3 +115,32 @@ export const Filter = styled.div`
     font-size: 12px;
   }
 `;
+
+export const Pagination = styled.footer`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+
+  button {
+    font-size: 14px;
+    padding: 4px 6px;
+    border-radius: 2px;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.1s linear;
+
+    & + button {
+      margin-left: 5px;
+    }
+
+    &:hover {
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &[disabled] {
+      color: #bbb;
+      cursor: not-allowed;
+    }
+  }
+`;
