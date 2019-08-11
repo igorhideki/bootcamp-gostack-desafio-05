@@ -99,3 +99,19 @@ export const IssueList = styled.ul`
     }
   }
 `;
+
+export const Filter = styled.div`
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+
+  span {
+    font-size: 16px;
+    color: #bbb;
+    margin-right: 10px;
+  }
+
+  select {
+    font-size: 12px;
+  }
+`;
